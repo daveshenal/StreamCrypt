@@ -1,0 +1,3 @@
+encryption:
+  key_b64: "A5Vr1qVRe6PONS+9izvxv81paKe7BeV3Nqg5jfH3t8U="
+  nonce_size: 12
