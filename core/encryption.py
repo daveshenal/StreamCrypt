@@ -2,7 +2,6 @@ import base64
 import yaml
 import os
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
-import lz4.frame
 
 # Load config
 with open("configs/config.yaml", "r") as f:
