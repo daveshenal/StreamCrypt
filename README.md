@@ -38,6 +38,7 @@ StreamCrypt/
 ├── final/          # Full-featured version (ngrok, Firebase, RSA, etc.)
 ├── ngrok/          # Standalone ngrok-based streaming
 ├── notebooks/      # Jupyter notebooks for demos and experiments
+├── utils/          # Utility scripts
 ├── .gitignore
 ├── README.md
 └── requirements.txt

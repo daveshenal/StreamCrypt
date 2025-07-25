@@ -1,0 +1,12 @@
+fastapi==0.110.3
+uvicorn==0.31.0
+python-dotenv==1.0.1
+opencv-python==4.10.0.84
+lz4==4.4.4
+cryptography==43.0.3
+numpy==1.26.4
+firebase_admin==6.6.0
+pyngrok==7.2.8
+PyYAML==6.0.1
+websockets==14.1
+requests==2.32.3
