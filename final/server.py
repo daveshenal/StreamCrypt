@@ -14,18 +14,24 @@ References:
 
 import asyncio
 import cv2
-import lz4.frame
 import os
 import logging
 import uvicorn
 import firebase_admin
 from pyngrok import ngrok
+from dotenv import load_dotenv
 from firebase_admin import credentials, db
 from fastapi.websockets import WebSocketState
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import serialization, hashes
+
+from core.encryption import encrypt_data_with_key
+from core.compression import compress_data
+from core.vid_process import process_video_frame
+
+# Load environment variables from .env
+load_dotenv()
 
 app = FastAPI()
 logger = logging.getLogger("uvicorn")
@@ -35,7 +41,7 @@ logger = logging.getLogger("uvicorn")
 # Load Firebase credentials
 cred = credentials.Certificate("credentials.json")
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://streamcrypt-c2575-default-rtdb.firebaseio.com/'
+    'databaseURL': os.getenv("FIREBASE_DATABASE_URL")
 })
 
 # -------------------- ngrok --------------------
@@ -65,37 +71,6 @@ PUBLIC_KEY_PEM = RSA_PUBLIC_KEY.public_bytes(
     format=serialization.PublicFormat.SubjectPublicKeyInfo
 )
 
-# Nonce size for ChaCha20
-NONCE_SIZE = 12
-
-# -------------------- compression levels --------------------
-
-# compression levels based on battery status
-VIDEO_COMPRESSION_LEVELS = {
-    'l': 10,  # High compression (low quality)
-    'm': 30,  # Medium compression
-    'f': 80,  # Low compression (high quality)
-}
-
-# -------------------- Function Tasks --------------------
-
-# Function to encrypt data using ChaCha20-Poly1305
-def encrypt_data(data: bytes, encryption_key: bytes) -> bytes:
-    nonce = os.urandom(NONCE_SIZE)
-    cipher = ChaCha20Poly1305(encryption_key)
-    encrypted_data = cipher.encrypt(nonce, data, None)  # None - associated data
-    return nonce + encrypted_data
-
-# Function to compress data using LZ4
-def compress_data(data: bytes) -> bytes:
-    return lz4.frame.compress(data)
-
-# Function to process video frames based on battery level
-def process_video_frame(frame, battery_level: chr = 'f'):
-    compression_level = VIDEO_COMPRESSION_LEVELS.get(battery_level, 50)  # Default = 50
-    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), compression_level]
-    _, buffer = cv2.imencode(".jpg", frame, encode_param)
-    return buffer.tobytes()
 
 # -------------------- End Points --------------------
 
@@ -143,7 +118,7 @@ async def websocket_video_stream(websocket: WebSocket):
                 # Compress and encrypt the frame
                 processed_frame = process_video_frame(frame)
                 compressed_frame = compress_data(processed_frame)
-                encrypted_frame = encrypt_data(compressed_frame, encryption_key)
+                encrypted_frame = encrypt_data_with_key(compressed_frame, encryption_key)
 
                 # if WebSocket connection is still open
                 if websocket.application_state == WebSocketState.CONNECTED:

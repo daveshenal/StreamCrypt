@@ -2,21 +2,25 @@ import asyncio
 import numpy as np
 import websockets
 import cv2
-import lz4.frame
 import os
 import firebase_admin
+from dotenv import load_dotenv
 from firebase_admin import credentials, db
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization, hashes
-from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
 
+from core.encryption import decrypt_data_with_key
+from core.compression import decompress_data
+
+# Load environment variables from .env
+load_dotenv()
 
 # -------------------- Firebase --------------------
 
 # Load Firebase credentials
 cred = credentials.Certificate("credentials.json")
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://streamcrypt-c2575-default-rtdb.firebaseio.com/'
+    'databaseURL': os.getenv("FIREBASE_DATABASE_URL")
 })
 
 # -------------------- Get ngrok Public URL --------------------
@@ -51,15 +55,7 @@ def encrypt_with_rsa(public_key, data):
             label=None
         )
     )
-    
-# -------------------- Decrypt --------------------
 
-# Decrypt video frames
-def decrypt_data(encrypted_data, decryption_key):
-    nonce = encrypted_data[:12]
-    encrypted_content = encrypted_data[12:]
-    cipher = ChaCha20Poly1305(decryption_key)
-    return cipher.decrypt(nonce, encrypted_content, None)
 
 # -------------------- Watch Stream --------------------
 
@@ -83,8 +79,8 @@ async def receive_video_stream():
 
         while True:
             encrypted_frame = await websocket.recv()
-            compressed_frame = decrypt_data(encrypted_frame, symmetric_key)
-            frame_data = lz4.frame.decompress(compressed_frame)
+            decrypted_frame = decrypt_data_with_key(encrypted_frame, symmetric_key)
+            frame_data = decompress_data(decrypted_frame)
 
             # Decode and display
             nparr = np.frombuffer(frame_data, np.uint8)
