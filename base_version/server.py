@@ -1,7 +1,7 @@
 import asyncio
 import cv2
-from fastapi.websockets import WebSocketState
 import logging
+from fastapi.websockets import WebSocketState
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 from core.encryption import encrypt_data
