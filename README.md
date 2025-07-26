@@ -18,8 +18,8 @@ StreamCrypt is a modular, learning-focused project that demonstrates how to buil
 - [Setup & Installation](#setup--installation)
 - [Usage](#usage)
   - [Base Version (Local)](#base-version-local)
-  - [Final Version (With Firebase/ngrok)](#final-version-with-firebase-ngrok)
   - [Ngrok Standalone](#ngrok-standalone)
+  - [Final Version with Firebase and ngrok](#final-version-with-firebase-and-ngrok)
 - [Configuration](#configuration)
 - [Core Modules](#core-modules)
 - [Notebooks & Demos](#notebooks--demos)
@@ -118,7 +118,7 @@ StreamCrypt/
   python ngrok/client.py
   ```
 
-### Final Version (With Firebase/ngrok)
+### Final Version with Firebase and ngrok
 
 - **Start the server (exposes via ngrok, uploads URL to Firebase):**
   ```bash
