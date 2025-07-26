@@ -71,7 +71,7 @@ StreamCrypt/
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/StreamCrypt.git
+   git clone https://github.com/daveshenal/StreamCrypt.git
    cd StreamCrypt
    ```
 
