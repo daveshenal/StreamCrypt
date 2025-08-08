@@ -1,3 +1,11 @@
+# Recommendation:
+# For development & local testing: Run directly on your host machine (pip install -r requirements.txt).
+
+# Docker is supported but primarily intended for deployment scenarios or headless operation. 
+# For local development with a webcam, running directly on your host machine is recommended
+
+# On Windows, webcam passthrough in Docker requires WSL2 and USB/IP setup.
+
 # Use lightweight Python base image
 FROM python:3.11-slim
 
